@@ -319,9 +319,11 @@ public class RNBluetoothEscposPrinterModule extends ReactContextBaseJavaModule
     public void printPic(String base64encodeStr, @Nullable  ReadableMap options) {
         int width = 0;
         int leftPadding = 0;
+        boolean shouldCut = true;
         if(options!=null){
             width = options.hasKey("width") ? options.getInt("width") : 0;
             leftPadding = options.hasKey("left")?options.getInt("left") : 0;
+            shouldCut = options.hasKey("shouldCut") ? options.getBoolean("shouldCut") : true;
         }
 
         //cannot larger then devicesWith;
@@ -345,9 +347,12 @@ public class RNBluetoothEscposPrinterModule extends ReactContextBaseJavaModule
             sendDataByte(Command.ESC_Init);
             sendDataByte(Command.LF);
             sendDataByte(data);
-            sendDataByte(PrinterCommand.POS_Set_PrtAndFeedPaper(30));
-            sendDataByte(PrinterCommand.POS_Set_Cut(1));
-            sendDataByte(PrinterCommand.POS_Set_PrtInit());
+            if(shouldCut)
+            {
+                sendDataByte(PrinterCommand.POS_Set_PrtAndFeedPaper(30));
+                sendDataByte(PrinterCommand.POS_Set_Cut(1));
+                sendDataByte(PrinterCommand.POS_Set_PrtInit());
+            }
         }
     }
 
@@ -452,6 +457,15 @@ public class RNBluetoothEscposPrinterModule extends ReactContextBaseJavaModule
             byte[] command = PrinterCommand.POS_Cut_One_Point();
             sendDataByte(command);
 
+         }catch (Exception e){
+            Log.d(TAG, e.getMessage());
+        }
+    }   
+
+    @ReactMethod
+    public void cut() {
+        try{
+            sendDataByte(PrinterCommand.POS_Set_Cut(1));
          }catch (Exception e){
             Log.d(TAG, e.getMessage());
         }
