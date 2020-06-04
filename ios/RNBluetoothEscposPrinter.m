@@ -34,6 +34,7 @@ Byte V[] = {0x56};//V
 Byte A[] = {0x61};//a
 Byte E[] = {0x45};//E
 Byte G[] = {0x47};//G
+Byte i[] = {0x69};//i
 
 RCTPromiseResolveBlock pendingResolve;
 RCTPromiseRejectBlock pendingReject;
@@ -189,6 +190,26 @@ RCT_EXPORT_METHOD(printText:(NSString *) text withOptions:(NSDictionary *) optio
         }
     }
 }
+
+
+RCT_EXPORT_METHOD(cut:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if(RNBluetoothManager.isConnected){
+
+        NSMutableData *toSend = [[NSMutableData alloc] init];
+        [toSend appendBytes:ESC length:sizeof(ESC)];
+        [toSend appendBytes:i length:sizeof(i)];
+    
+        NSLog(@"Goting to write text : %@",text);
+        NSLog(@"With data: %@",toSend);
+        [RNBluetoothManager writeValue:toSend withDelegate:delegate:self];
+    }else{
+        reject(@"COMMAND_NOT_SEND",@"COMMAND_NOT_SEND",nil);
+    }
+    
+}
+
 -(NSStringEncoding) toNSEncoding:(NSString *)encoding
 {NSLog(@"encoding: %@",encoding);
     NSStringEncoding nsEncoding = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
