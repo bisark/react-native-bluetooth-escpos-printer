@@ -196,18 +196,15 @@ RCT_EXPORT_METHOD(cut:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
     if(RNBluetoothManager.isConnected){
-
         NSMutableData *toSend = [[NSMutableData alloc] init];
         [toSend appendBytes:ESC length:sizeof(ESC)];
         [toSend appendBytes:i length:sizeof(i)];
-    
-        NSLog(@"Goting to write text : %@",text);
-        NSLog(@"With data: %@",toSend);
-        [RNBluetoothManager writeValue:toSend withDelegate:delegate:self];
+        pendingResolve = resolve;
+        pendingReject = reject;
+        [RNBluetoothManager writeValue:toSend withDelegate:self];
     }else{
         reject(@"COMMAND_NOT_SEND",@"COMMAND_NOT_SEND",nil);
     }
-    
 }
 
 -(NSStringEncoding) toNSEncoding:(NSString *)encoding
